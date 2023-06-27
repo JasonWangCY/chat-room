@@ -9,27 +9,10 @@ public class ReadThread
     private readonly Socket _socket;
     private readonly ChatClient _chatClient;
 
-    private StreamReader _reader = null!;
-
     public ReadThread(Socket socket, ChatClient chatClient)
     {
         _socket = socket;
         _chatClient = chatClient;
-
-        InitializeConnection();
-    }
-
-    private void InitializeConnection()
-    {
-        try
-        {
-            var inputStream = new NetworkStream(_socket, FileAccess.Read);
-            _reader = new StreamReader(inputStream);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error getting input stream: {ex}");
-        }
     }
 
     public void Start(CancellationTokenSource cancellationTokenSrc)
@@ -43,6 +26,8 @@ public class ReadThread
     {
         while (!cancellationTokenSrc.IsCancellationRequested)
         {
+            if (!_chatClient._isConnected) continue;
+
             try
             {
                 var buffer = new byte[1_024];

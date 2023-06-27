@@ -81,7 +81,7 @@ public class UserThread : IUserThread
 
     private async Task PrintUsersAsync()
     {
-        var message = string.Empty;
+        string? message;
         if (_server.HasUsers())
         {
             message = $"Connected users: {string.Join(", ", _server.GetUserNames())}";

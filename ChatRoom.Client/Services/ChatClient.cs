@@ -8,6 +8,7 @@ namespace ChatRoom.Client.Services;
 public class ChatClient : IChatClient
 {
     private string _userName = null!;
+    internal volatile bool _isConnected = false;
 
     public void Execute(int port, CancellationTokenSource cancellationTokenSrc)
     {
@@ -15,6 +16,8 @@ public class ChatClient : IChatClient
         var ipAddress = host.AddressList.First();
         var ipEndPoint = new IPEndPoint(ipAddress, port);
 
+        // TODO: Use async for the threads and socket connections
+        // TODO: Use interfaces
         try
         {
             Console.WriteLine($"Connecting to the chat server at {ipEndPoint}");
@@ -23,8 +26,8 @@ public class ChatClient : IChatClient
 
             Console.WriteLine("Connected to the chat server");
 
-            new ReadThread(socket, this).Start(cancellationTokenSrc);
             new WriteThread(socket, this).Start(cancellationTokenSrc);
+            new ReadThread(socket, this).Start(cancellationTokenSrc);
         }
         catch (SocketException ex)
         {
